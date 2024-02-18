@@ -27,7 +27,9 @@ public:
     std::string toString() const;
 
 private:
-    std::string number; 
+    std::string integer; 
+    std::string fractional; 
+    bool sign; 
 };
 
 #endif 
