@@ -1,5 +1,6 @@
 #include "BigNumber.h"
 #include <algorithm>
+#include <vector>
 
 BigNumber BigNumber::operator - () const{
     BigNumber other = *this;
