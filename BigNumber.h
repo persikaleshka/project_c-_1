@@ -5,11 +5,12 @@
 #include <iostream>
 
 class BigNumber {
-public:
+private:
     std::string integer; 
     std::string fractional; 
-    bool sign; 
-
+    bool sign;
+public:
+     
     BigNumber() : integer("0"), fractional("0"), sign(false) {};
 
     BigNumber(const std::string& number) {
@@ -35,7 +36,7 @@ public:
     BigNumber operator - () const;
     BigNumber operator + () const;
     friend BigNumber operator + (const BigNumber& first, const BigNumber& second); 
-    friend BigNumber operator - (const BigNumber& first,  const BigNumber& second); 
+    friend BigNumber operator - (const BigNumber& first, const BigNumber& second); 
     friend BigNumber operator * (const BigNumber& first, const BigNumber& second); 
     friend BigNumber operator / (const BigNumber& first, const BigNumber& second); 
 
@@ -48,11 +49,11 @@ public:
     bool operator >= (const BigNumber& other) const; 
 
     std::string toString() const;
-
+    
+    // input and output
+    friend std::istream& operator >> (std::istream& in, BigNumber& number);
+    friend std::ostream& operator << (std::ostream& out, const BigNumber& number);
 };
 
-// input and output
-std::ostream& operator << (std::ostream& out, const BigNumber& number);
-std::istream& operator >> (std::istream& in, BigNumber& number);
 
 #endif 
