@@ -1,33 +1,6 @@
 #include "BigNumber.h"
 #include <algorithm>
 
-BigNumber::BigNumber() : integer("0"), fractional("0"), sign(false) {}
-
-BigNumber::BigNumber(const std::string& number) {
-    size_t dotPosition = number.find('.');
-    sign = number[0] == '-';
-    if (dotPosition != std::string::npos) {
-        integer = number.substr(0, dotPosition);
-        fractional = number.substr(dotPosition + 1);
-    } else {
-        integer = number;
-        fractional = "0";
-    }
-    if (sign) {
-        integer = integer.substr(1); // Убираем знак минус из целой части
-    }
-    // Удаление ведущих нулей из целой части
-    integer.erase(0, std::min(integer.find_first_not_of('0'), integer.size() - 1));
-}
-
-// BigNumber::BigNumber(double value) {
-//     number = std::to_string(value);
-//     number.erase(number.find_last_not_of('0') + 1, std::string::npos);
-//     if (number.back() == '.') {
-//         number.pop_back();
-//     }
-// }
-
 BigNumber BigNumber::operator - () const{
     BigNumber other = *this;
     other.sign = !other.sign;
@@ -36,17 +9,15 @@ BigNumber BigNumber::operator - () const{
 BigNumber BigNumber::operator + () const{
     return *this;
 }
-// Равно
+
 bool BigNumber::operator==(const BigNumber& other) const {
     return sign == other.sign && integer == other.integer && fractional == other.fractional;
 }
 
-// Не равно
 bool BigNumber::operator!=(const BigNumber& other) const {
     return !(sign == other.sign && integer == other.integer && fractional == other.fractional);
 }
 
-// Меньше
 bool BigNumber::operator<(const BigNumber& other) const {
     if (sign != other.sign){
         return sign;
@@ -58,7 +29,6 @@ bool BigNumber::operator<(const BigNumber& other) const {
     return (fractional < other.fractional) != sign;
 }
 
-// Больше
 bool BigNumber::operator>(const BigNumber& other) const {
     if (sign != other.sign){
         return other.sign;
@@ -70,7 +40,6 @@ bool BigNumber::operator>(const BigNumber& other) const {
     return (fractional > other.fractional) != other.sign;
 }
 
-// Меньше или равно
 bool BigNumber::operator<=(const BigNumber& other) const {
     if (sign != other.sign){
         return sign;
@@ -82,7 +51,6 @@ bool BigNumber::operator<=(const BigNumber& other) const {
     return (fractional <= other.fractional) != sign;
 }
 
-// Больше или равно
 bool BigNumber::operator>=(const BigNumber& other) const {
     if (sign != other.sign){
         return other.sign;
@@ -95,7 +63,6 @@ bool BigNumber::operator>=(const BigNumber& other) const {
 }
 
 
-// Сложение
 std::string add_int(std::string& a, std::string& b){
     std::string result, slag;
     int len_a = a.size(), len_b = b.size();
@@ -184,9 +151,15 @@ BigNumber operator + (const BigNumber& first, const BigNumber& second) {
 BigNumber operator - (const BigNumber& first, const BigNumber& second){
     BigNumber result;
 
-    if(second.sign) return first + (-second);
-    else if(first.sign) return -((-first) + second);
-    else if(first < second) return -(second - first);
+    if(second.sign){
+        return first + (-second);
+    }
+    else if(first.sign){
+        return -((-first) + second);
+    } 
+    else if(first < second){
+        return -(second - first);
+    } 
 
     std::string f1 = first.fractional;
     std::string f2 = second.fractional;
@@ -257,7 +230,7 @@ BigNumber operator - (const BigNumber& first, const BigNumber& second){
 
 
 // Оператор вывода
-std::ostream& operator<<(std::ostream& out, const BigNumber& number) {
+std::ostream& operator << (std::ostream& out, const BigNumber& number) {
     if (number.sign) {
         out << '-';
     }
@@ -269,7 +242,7 @@ std::ostream& operator<<(std::ostream& out, const BigNumber& number) {
 }
 
 // Оператор ввода
-std::istream& operator>>(std::istream& in, BigNumber& number) {
+std::istream& operator >> (std::istream& in, BigNumber& number) {
     std::string input;
     in >> input;
 
@@ -291,3 +264,40 @@ std::istream& operator>>(std::istream& in, BigNumber& number) {
     return in;
 }
 
+BigNumber operator * (const BigNumber& first, const BigNumber& second){
+    int len_int_1 = first.integer.length(), len_int_2 = second.integer.length();
+    int len_frac_1 = first.fractional.length(), len_frac_2 = second.fractional.length();
+
+    std::string number_1 = first.integer + first.fractional;
+    std::string number_2 = second.integer + second.fractional;
+
+    int len_frac = len_frac_1 + len_frac_2;
+
+    std::vector<int> result(number_1.length() + number_2.length(), 0);
+
+    for (int i = number_1.length() - 1; i >= 0; i--) {
+        for (int j = number_2.length() - 1; j >= 0; j--) {
+            int mul = (number_1[i] - '0') * (number_2[j] - '0');
+            int sum = result[i + j + 1] + mul;
+            result[i + j + 1] = sum % 10;
+            result[i + j] += sum / 10;
+        }
+    }
+
+    std::string res_str;
+    for (int num : result) {
+        if (!(res_str.empty() && num == 0)) { 
+            res_str.push_back(num + '0');
+        }
+    }
+
+    if (len_frac > 0) {
+        res_str.insert(res_str.length() - len_frac, ".");
+    }
+
+    if (first.sign != second.sign && res_str != "0") {
+        res_str.insert(0, "-");
+    }
+
+    return BigNumber(res_str);
+}
