@@ -12,8 +12,12 @@ private:
 public:
      
     BigNumber() : integer("0"), fractional("0"), sign(false) {};
-
-    BigNumber(const std::string& number) {
+    explicit BigNumber(int number);
+    explicit BigNumber(unsigned number);
+    explicit BigNumber(long long number);
+    explicit BigNumber(unsigned long long number);
+    explicit BigNumber(double number);
+    explicit BigNumber(const std::string& number) {
         std::string num = number;
         if (num[0] == '-') {
             sign = true;
@@ -28,9 +32,7 @@ public:
             integer = num;
             fractional = "";
         }
-    };
-
-    BigNumber(double value);                
+    };               
 
     // Операторы арифметики
     BigNumber operator - () const;
@@ -47,8 +49,6 @@ public:
     bool operator > (const BigNumber& other) const;  
     bool operator <= (const BigNumber& other) const; 
     bool operator >= (const BigNumber& other) const; 
-
-    std::string toString() const;
     
     // input and output
     friend std::istream& operator >> (std::istream& in, BigNumber& number);
