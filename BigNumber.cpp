@@ -1,6 +1,7 @@
 #include "BigNumber.h"
 #include <algorithm>
 #include <vector>
+#include <math.h>
 
 BigNumber BigNumber::operator - () const{
     BigNumber other = *this;
@@ -112,7 +113,9 @@ BigNumber operator + (const BigNumber& first, const BigNumber& second) {
         } else{
             return (second - (-first));
         }
-    } else if(second.sign) return (first - (-second));
+    } else if(second.sign){
+        return (first - (-second));
+    } 
 
     int len_frac_a = frac_a.size(), len_frac_b = frac_b.size();
     int r = abs(len_frac_a - len_frac_b);
@@ -301,4 +304,26 @@ BigNumber operator * (const BigNumber& first, const BigNumber& second){
     }
 
     return BigNumber(res_str);
+}
+
+BigNumber operator / (const BigNumber& first, const BigNumber& second) {
+    if (second.integer == "0" && second.fractional == "0") {
+        throw std::invalid_argument("Division by zero.");
+    }
+
+    BigNumber low = BigNumber("0");
+    BigNumber high = BigNumber("1" + '0' * second.fractional.size());
+    BigNumber mid;
+    BigNumber precision("0.000001"); // Точность результата
+
+    while (high - low > precision) {
+        mid = (low + high) / BigNumber("2");
+        if (BigNumber(mid) * second < BigNumber("1")) {
+            low = mid;
+        } else {
+            high = mid;
+        }
+    }
+
+    return low * first;
 }
