@@ -23,6 +23,9 @@ public:
             sign = true;
             num = num.substr(1);
         }
+        else{
+            sign = false;
+        }
 
         size_t pos_point = num.find('.');
         if (pos_point != std::string::npos) {
@@ -45,8 +48,8 @@ public:
     // Операторы сравнения
     bool operator == (const BigNumber& other) const; 
     bool operator != (const BigNumber& other) const; 
-    bool operator < (const BigNumber& other) const;  
-    bool operator > (const BigNumber& other) const;  
+    friend bool operator < (const BigNumber& first, const BigNumber& second);  
+    friend bool operator > (const BigNumber& first, const BigNumber& second);  
     bool operator <= (const BigNumber& other) const; 
     bool operator >= (const BigNumber& other) const; 
     
