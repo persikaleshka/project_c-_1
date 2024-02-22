@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
 
 class BigNumber {
 private:
@@ -10,14 +11,65 @@ private:
     std::string fractional; 
     bool sign;
 public:
-     
+    static size_t precision;
     BigNumber() : integer("0"), fractional("0"), sign(false) {};
-    explicit BigNumber(int number);
-    explicit BigNumber(unsigned number);
-    explicit BigNumber(long long number);
-    explicit BigNumber(unsigned long long number);
-    explicit BigNumber(double number);
-    explicit BigNumber(const std::string& number) {
+    BigNumber(int number){
+        std::string num = std::to_string(number);
+        if (num[0] == '-') {
+            sign = true;
+            num = num.substr(1);
+        }
+        else{
+            sign = false;
+        }
+        integer = num;
+        fractional = "";
+
+    };
+    BigNumber(unsigned number){
+        std::string num = std::to_string(number);
+        sign = false;
+        integer = num;
+        fractional = "";
+    };
+    BigNumber(long long number){
+        std::string num = std::to_string(number);
+        if (num[0] == '-') {
+            sign = true;
+            num = num.substr(1);
+        }
+        else{
+            sign = false;
+        }
+        integer = num;
+        fractional = "";
+    };
+    BigNumber(unsigned long long number){
+        std::string num = std::to_string(number);
+        sign = false;
+        integer = num;
+        fractional = "";
+    };
+    BigNumber(double number){
+        std::string num = std::to_string(number);
+        if (num[0] == '-'){
+            sign = true;
+            num = num.substr(1);
+        }
+        else{
+            sign = false;
+        }
+
+        size_t pos_point = num.find('.');
+        if (pos_point != std::string::npos) {
+            integer = num.substr(0, pos_point);
+            fractional = num.substr(pos_point + 1);
+        } else {
+            integer = num;
+            fractional = "";
+        }
+    };
+    BigNumber(const std::string& number) {
         std::string num = number;
         if (num[0] == '-') {
             sign = true;
