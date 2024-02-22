@@ -260,8 +260,25 @@ std::ostream& operator << (std::ostream& out, const BigNumber& number) {
         out << '-';
     }
     out << number.integer;
+    
     if (!number.fractional.empty() && number.fractional != "0") {
-        out << '.' << number.fractional;
+        
+        int pos_back = std::min(BigNumber::precision, number.fractional.size());
+        std::string frac(pos_back, '0');
+        for (int i = 0; i < pos_back; i++){
+            frac[i] = number.fractional[i];
+        }
+        while(!frac.empty() && frac.back() == '0'){
+            frac.pop_back();
+        }
+        pos_back = std::min(BigNumber::precision, frac.length());
+        if (pos_back != 0){
+            out << '.';
+        }
+        
+        for (size_t i = 0; i < pos_back; i++){
+            out << frac[i];
+        }
     }
     return out;
 }
@@ -370,26 +387,30 @@ BigNumber operator / (const BigNumber& first, const BigNumber& second) {
     BigNumber low = BigNumber("0");
     BigNumber high = BigNumber("1" + std::string(second.fractional.size(), '0'));
     BigNumber mid;
-    BigNumber precision = BigNumber("0.00000000001"); 
-    int c = 1;
-    while ((high - low) > precision) {
+    BigNumber eps("0.5");
+    for (size_t i = 0; i < BigNumber::precision + 5; i++){
+        eps = eps * BigNumber("0.1");
+    }
+    while ((high - low) > eps) {
         mid = (low + high) * BigNumber("0.5");
         if (mid * second < BigNumber("1")) {
             low = mid;
         } else {
             high = mid;
         }
-        c++;
-        // if (c > 200){
-        //     break;
-        // }
     }
-    BigNumber res = high * first;
+    BigNumber res = (low + eps) * first;
     if (res.integer == ""){
         res.integer = "0";
     }
     if (res == BigNumber("-0")){
         res.sign = false;
+    }
+    while(res.fractional.back() == '0'){
+        res.fractional.pop_back();
+    }
+    if (res.fractional.empty()){
+        res.fractional = "0";
     }
     return res;
 }
