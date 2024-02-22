@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(project_c-_1)
-
-set(CMAKE_CXX_STANDARD 17)
-add_subdirectory(BigNumber)
+add_library(BigNumber BigNumber.h BigNumber.cpp)
+set(CMAKE_CXX_STANDARD 14)
 add_executable(main main.cpp)
+add_executable(test test.cpp)
 target_link_libraries(main BigNumber)
+target_link_libraries(test BigNumber)
